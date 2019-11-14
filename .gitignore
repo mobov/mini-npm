@@ -1,0 +1,6 @@
+node_modules
+mini_node_modules
+out
+.history
+.vscode
+npm-debug.log
