@@ -1,5 +1,5 @@
 # mini-npm
-> 只安装纯净的npm依赖包
+> clean mini npm, 纯净版npm，只安装npm依赖包而没有多余的依赖
 
 ## 安装
 ```shell
