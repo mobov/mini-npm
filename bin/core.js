@@ -49,34 +49,68 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var fs = __importStar(require("fs"));
 var config_1 = __importDefault(require("./config"));
 var compressing_1 = __importDefault(require("compressing"));
-var chalk_1 = __importDefault(require("chalk"));
 var path_1 = __importDefault(require("path"));
 var shelljs_1 = __importDefault(require("shelljs"));
+var listr_1 = __importDefault(require("listr"));
+var packageJson = require(path_1.default.resolve('package.json'));
+var resolveTgzName = function (name, version) {
+    name = name.replace(/@/g, '').replace(/\//, '-');
+    return name + "-" + version + ".tgz";
+};
 var resolveVersion = function (version) {
     if (version.indexOf('^') !== -1) {
         version = version.substring(1, version.length);
     }
     return version;
 };
+var getPackLists = function (data) {
+    var result = [];
+    if (data instanceof Array) {
+        result = data.map(function (x) {
+            var name = x;
+            var version = '';
+            var splitIndex = x.lastIndexOf('@');
+            if (splitIndex > 0) {
+                name = x.substr(0, splitIndex);
+                version = x.substr(splitIndex + 1, x.length);
+            }
+            return {
+                name: name,
+                version: version
+            };
+        });
+    }
+    else {
+        result = Object.keys(data).map(function (x) { return ({
+            name: x,
+            version: resolveVersion(data[x])
+        }); });
+    }
+    return result;
+};
 /**
- * 获取包信息
+ * 获取包最新版本
  * @param name 包名
- * @param version 包版本
  */
-var getPackInfo = function (name, version) {
-    var getTarball = function (str) {
-        var regex = new RegExp(/tarball: '(.*?)'/, 'g');
+var getPackLastVersion = function (name) {
+    // const getTarball = (str: string): string => {
+    //   const regex = new RegExp(/tarball: '(.*?)'/, 'g')
+    //   const arr = str.match(regex)
+    //   const result = arr[0].substring(10, arr[0].length - 1)
+    //   console.log(result)
+    //   return result
+    // }
+    var getVersion = function (str) {
+        var regex = new RegExp(/version: '(.*?)'/, 'g');
         var arr = str.match(regex);
         var result = arr[0].substring(10, arr[0].length - 1);
-        console.log(result);
         return result;
     };
     return new Promise(function (resolve, reject) {
-        var result = { name: name, version: version, dist: {} };
-        shelljs_1.default.exec("npm view " + name + "@" + resolveVersion(version), { silent: true }, function (code, data) {
-            result.dist.tarball = getTarball(data);
+        shelljs_1.default.exec("npm view " + name, { silent: true }, function (code, data) {
             if (code === 0) {
-                resolve(result);
+                var version = getVersion(data);
+                resolve(version);
             }
             else {
                 reject();
@@ -85,25 +119,37 @@ var getPackInfo = function (name, version) {
     });
 };
 /**
+ * 写入包依赖
+ * @param name 包名
+ * @param version 包版本
+ */
+var writeDependencie = function (name, version) {
+    if (packageJson.dependencies[name] &&
+        packageJson.dependencies[name] === "^" + version) {
+        return;
+    }
+    else {
+        packageJson.dependencies[name] = "^" + version;
+        fs.writeFileSync('../package.json', JSON.stringify(packageJson, null, 4));
+    }
+};
+/**
  * 解压包
  * @param name 包名
  * @param version 包版本
  */
 var unzipPack = function (name, version) {
     return new Promise(function (resolve, reject) {
-        var filePath = path_1.default.resolve("./" + name + "-" + version + ".tgz");
+        var filePath = path_1.default.resolve("./" + resolveTgzName(name, version));
         shelljs_1.default.rm('-rf', name + "/*");
         compressing_1.default.tgz
             .uncompress(filePath, name)
             .then(function (res) {
-            // todo: 展开下载包
             shelljs_1.default.mv('-f', name + "/package/*", "" + name);
             shelljs_1.default.rm('-rf', name + "/package");
             shelljs_1.default.rm('-rf', filePath);
-            console.log(chalk_1.default.green("install " + name + " success!"));
-            resolve();
+            resolve('unziped');
         }).catch(function (err) {
-            console.log(chalk_1.default.red("install " + name + " fail!"));
             reject();
         });
     });
@@ -119,7 +165,7 @@ var downloadPack = function (name, version) {
         return __generator(this, function (_a) {
             packageJsonPath = "./" + name + "/package.json";
             handleDowload = function () {
-                shelljs_1.default.exec("npm pack " + name + "@" + resolveVersion(version), { silent: true }, function (code, data) {
+                shelljs_1.default.exec("npm pack " + name + "@" + version, { silent: true }, function (code, data) {
                     if (code === 0) {
                         resolve('downloaded');
                     }
@@ -137,7 +183,6 @@ var downloadPack = function (name, version) {
                 sourcePackage = JSON.parse(sourcePackage);
                 // 判断是否需要更新
                 if (resolveVersion(sourcePackage.version) === version) {
-                    console.log("module " + name + " exist!");
                     resolve('exist');
                 }
                 else {
@@ -152,46 +197,134 @@ var downloadPack = function (name, version) {
     }); });
 };
 /**
- * 任务管道
+ * 添加任务管道
  * @param name 包名
  * @param version 包版本
  */
-var handleTask = function (name, version) {
+var handleAdd = function (name, version) {
     return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
         var status_1, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 4, , 5]);
-                    return [4 /*yield*/, downloadPack(name, version)];
+                    _a.trys.push([0, 6, , 7]);
+                    if (!!version) return [3 /*break*/, 2];
+                    return [4 /*yield*/, getPackLastVersion(name)];
                 case 1:
-                    status_1 = _a.sent();
-                    if (!(status_1 === 'downloaded')) return [3 /*break*/, 3];
-                    return [4 /*yield*/, unzipPack(name, version)];
-                case 2:
-                    status_1 = _a.sent();
-                    _a.label = 3;
+                    version = _a.sent();
+                    _a.label = 2;
+                case 2: return [4 /*yield*/, downloadPack(name, version)];
                 case 3:
-                    resolve();
-                    return [3 /*break*/, 5];
+                    status_1 = _a.sent();
+                    if (!(status_1 === 'downloaded')) return [3 /*break*/, 5];
+                    return [4 /*yield*/, unzipPack(name, version)];
                 case 4:
+                    status_1 = _a.sent();
+                    _a.label = 5;
+                case 5:
+                    writeDependencie(name, version);
+                    resolve();
+                    return [3 /*break*/, 7];
+                case 6:
                     err_1 = _a.sent();
                     reject(err_1);
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     }); });
 };
-function default_1(list) {
-    var listMap = Object.keys(list);
-    if (listMap.length > 0) {
+var handleRemove = function (name) {
+    return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            shelljs_1.default.rm('-rf', "" + name);
+            if (packageJson.dependencies[name]) {
+                delete packageJson.dependencies[name];
+            }
+            fs.writeFileSync('../package.json', JSON.stringify(packageJson, null, 4));
+            resolve();
+            return [2 /*return*/];
+        });
+    }); });
+};
+/**
+ * 安装
+ * @param list 依赖
+ */
+function install(list) {
+    var packLists = getPackLists(list);
+    if (packLists.length > 0) {
         shelljs_1.default.mkdir('-p', path_1.default.resolve(config_1.default.output));
         shelljs_1.default.cd(path_1.default.resolve(config_1.default.output));
     }
-    return Promise.all(listMap.map(function (x) { return handleTask(x, resolveVersion(list[x])); })).then(function (res) {
-        console.log(chalk_1.default.green("mini-npm success!"));
-        return res;
+    else {
+        return;
+    }
+    var tasks = new listr_1.default(packLists.map(function (x) {
+        return {
+            title: "install " + x.name,
+            task: function () { return handleAdd(x.name, x.version); }
+        };
+    }));
+    return tasks.run().then(function () {
+        console.log("  ");
+        console.log("   mini-npm run success!");
+    }).catch(function (err) {
+        console.error(err);
+    });
+    // return Promise.all(listMap.map(async (x) => await handleAdd(x, resolveVersion(list[x])))).then(res => {
+    //   console.log(`mini-npm run success!`)
+    //   return res
+    // })
+}
+exports.install = install;
+/**
+ * 添加
+ * @param name
+ */
+function add(list) {
+    var packLists = getPackLists(list);
+    if (packLists.length > 0) {
+        shelljs_1.default.mkdir('-p', path_1.default.resolve(config_1.default.output));
+        shelljs_1.default.cd(path_1.default.resolve(config_1.default.output));
+    }
+    else {
+        return;
+    }
+    var tasks = new listr_1.default(packLists.map(function (x) {
+        return {
+            title: "install " + x.name,
+            task: function () { return handleAdd(x.name, x.version); }
+        };
+    }));
+    return tasks.run().then(function () {
+        console.log("  ");
+        console.log("   mini-npm run success!");
+    }).catch(function (err) {
+        console.error(err);
     });
 }
-exports.default = default_1;
+exports.add = add;
+function remove(list) {
+    var packLists = getPackLists(list);
+    if (packLists.length > 0) {
+        shelljs_1.default.mkdir('-p', path_1.default.resolve(config_1.default.output));
+        shelljs_1.default.cd(path_1.default.resolve(config_1.default.output));
+    }
+    else {
+        return;
+    }
+    var tasks = new listr_1.default(packLists.map(function (x) {
+        return {
+            title: "remove " + x.name,
+            task: function () { return handleRemove(x.name); }
+        };
+    }));
+    return tasks.run().then(function () {
+        console.log("  ");
+        console.log("   mini-npm run success!");
+    }).catch(function (err) {
+        console.error(err);
+    });
+}
+exports.remove = remove;

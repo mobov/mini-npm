@@ -16,7 +16,12 @@ yarn global add mini-npm
  mini-npm install
 ```
 
-### 新增依赖包(todo)
+### 新增依赖包
 ```shell
  mini-npm add <pkg>@<version>
+```
+
+### 移除依赖包
+```shell
+ mini-npm remove <pkg>@<version>
 ```

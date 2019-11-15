@@ -1,4 +1,6 @@
-import * as packageJson from '../package.json'
+import path from 'path'
+
+const packageJson = require(path.resolve('package.json'))
 
 interface Config {
   output: string
