@@ -27,7 +27,8 @@ yarn global add mini-npm
 ```
 
 ### 指定输出目录名
-``` package.json
+在package.json中加入以下配置
+``` json
    "mini-npm-config": {
         "output": "mini_node_modules/"
     },
