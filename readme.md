@@ -16,7 +16,7 @@ yarn global add mini-npm
  mpm install
 ```
 
-### 新增依赖包
+### 新增/更新依赖包
 ```shell
  mpm add <pkg>@<version>
 ```
