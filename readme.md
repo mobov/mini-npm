@@ -25,3 +25,10 @@ yarn global add mini-npm
 ```shell
  mpm remove <pkg>@<version>
 ```
+
+### 指定输出目录名
+``` package.json
+   "mini-npm-config": {
+        "output": "mini_node_modules/"
+    },
+```
