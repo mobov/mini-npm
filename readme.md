@@ -13,15 +13,15 @@ yarn global add mini-npm
 ## 使用
 ### 安装依赖包
 ```shell
- mini-npm install
+ mpm install
 ```
 
 ### 新增依赖包
 ```shell
- mini-npm add <pkg>@<version>
+ mpm add <pkg>@<version>
 ```
 
 ### 移除依赖包
 ```shell
- mini-npm remove <pkg>@<version>
+ mpm remove <pkg>@<version>
 ```

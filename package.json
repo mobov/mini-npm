@@ -1,6 +1,6 @@
 {
   "name": "mini-npm",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "mini npm",
   "main": "index.js",
   "repository": "git@github.com:mobov/mini-npm.git",
@@ -11,7 +11,7 @@
     "build": "tsc"
   },
   "bin": {
-    "mini-npm": "./bin/index.js"
+    "mpm": "./bin/index.js"
   },
   "mini-npm-config": {
     "output": "mini_node_modules/"
