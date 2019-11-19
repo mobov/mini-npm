@@ -1,6 +1,6 @@
 import path from 'path'
 
-const packageJson = require(path.resolve('package.json'))
+const packageJson = require(path.resolve(process.cwd(), './package.json'))
 
 interface Config {
   output: string

@@ -2,12 +2,11 @@
 import chalk from 'chalk'
 import path from 'path'
 import program from 'commander'
-import * as packageJson from '../package.json'
 import { install, add, remove } from './core'
 
-program.version(packageJson['version'])
+const packageJson = require('../package.json')
 
-program
+program.version(packageJson['version'])
   .command('install')
   .description('安装依赖(install packages)')
   .action(() => {
@@ -15,14 +14,14 @@ program
     install(targetPackage.dependencies)
   })
 
-program
+program.version(packageJson['version'])
   .command('add <pack...>')
   .description('添加依赖(add packages)')
   .action(pack => {
     add(pack)
   })
 
-program
+program.version(packageJson['version'])
   .command('remove <pack...>')
   .description('移除依赖(remove packages)')
   .action(pack => {
