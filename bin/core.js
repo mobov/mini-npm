@@ -149,7 +149,8 @@ var unzipPack = function (name, version) {
             shelljs_1.default.rm('-rf', name + "/package");
             shelljs_1.default.rm('-rf', filePath);
             resolve('unziped');
-        }).catch(function (err) {
+        })
+            .catch(function (err) {
             reject();
         });
     });
@@ -266,10 +267,13 @@ function install(list) {
             task: function () { return handleAdd(x.name, x.version); }
         };
     }));
-    return tasks.run().then(function () {
+    return tasks
+        .run()
+        .then(function () {
         console.log("  ");
         console.log("   mini-npm run success!");
-    }).catch(function (err) {
+    })
+        .catch(function (err) {
         console.error(err);
     });
     // return Promise.all(listMap.map(async (x) => await handleAdd(x, resolveVersion(list[x])))).then(res => {
@@ -297,10 +301,13 @@ function add(list) {
             task: function () { return handleAdd(x.name, x.version); }
         };
     }));
-    return tasks.run().then(function () {
+    return tasks
+        .run()
+        .then(function () {
         console.log("  ");
         console.log("   mini-npm run success!");
-    }).catch(function (err) {
+    })
+        .catch(function (err) {
         console.error(err);
     });
 }
@@ -320,10 +327,13 @@ function remove(list) {
             task: function () { return handleRemove(x.name); }
         };
     }));
-    return tasks.run().then(function () {
+    return tasks
+        .run()
+        .then(function () {
         console.log("  ");
         console.log("   mini-npm run success!");
-    }).catch(function (err) {
+    })
+        .catch(function (err) {
         console.error(err);
     });
 }

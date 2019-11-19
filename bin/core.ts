@@ -33,7 +33,7 @@ const resolveVersion = (version: string): string => {
 }
 
 const getPackLists = (data: PackItem | Dependencies): PackLists => {
-  let result:PackLists = []
+  let result: PackLists = []
   if (data instanceof Array) {
     result = data.map(x => {
       let name = x
@@ -50,7 +50,7 @@ const getPackLists = (data: PackItem | Dependencies): PackLists => {
       }
     })
   } else {
-    result = Object.keys(data).map((x) => ({
+    result = Object.keys(data).map(x => ({
       name: x,
       version: resolveVersion(data[x])
     }))
@@ -78,7 +78,6 @@ const getPackLastVersion = (name: string): Promise<string> => {
   }
   return new Promise((resolve, reject) => {
     shell.exec(`npm view ${name}`, { silent: true }, (code, data) => {
-    
       if (code === 0) {
         const version = getVersion(data)
         resolve(version)
@@ -96,9 +95,9 @@ const getPackLastVersion = (name: string): Promise<string> => {
  */
 const writeDependencie = (name: string, version: string) => {
   if (
-      packageJson.dependencies[name] &&
-      packageJson.dependencies[name] === `^${version}`
-    ) {
+    packageJson.dependencies[name] &&
+    packageJson.dependencies[name] === `^${version}`
+  ) {
     return
   } else {
     packageJson.dependencies[name] = `^${version}`
@@ -116,15 +115,16 @@ const unzipPack = (name: string, version: string) => {
     const filePath = path.resolve(`./${resolveTgzName(name, version)}`)
     shell.rm('-rf', `${name}/*`)
     compressing.tgz
-    .uncompress(filePath, name)
-    .then(res => {
-      shell.mv('-f', `${name}/package/*`, `${name}`)
-      shell.rm('-rf', `${name}/package`)
-      shell.rm('-rf', filePath)
-      resolve('unziped')
-    }).catch(err => {
-      reject()
-    })
+      .uncompress(filePath, name)
+      .then(res => {
+        shell.mv('-f', `${name}/package/*`, `${name}`)
+        shell.rm('-rf', `${name}/package`)
+        shell.rm('-rf', filePath)
+        resolve('unziped')
+      })
+      .catch(err => {
+        reject()
+      })
   })
 }
 
@@ -138,13 +138,17 @@ const downloadPack = (name: string, version: string) => {
     const packageJsonPath = `./${name}/package.json`
 
     const handleDowload = () => {
-      shell.exec(`npm pack ${name}@${version}`, { silent: true }, (code, data) => {
-        if (code === 0) {
-          resolve('downloaded')
-        } else {
-          reject()
+      shell.exec(
+        `npm pack ${name}@${version}`,
+        { silent: true },
+        (code, data) => {
+          if (code === 0) {
+            resolve('downloaded')
+          } else {
+            reject()
+          }
         }
-      })
+      )
     }
     if (fs.existsSync(name)) {
       shell.mkdir('-p', name)
@@ -158,7 +162,7 @@ const downloadPack = (name: string, version: string) => {
         resolve('exist')
       } else {
         handleDowload()
-      }    
+      }
     } else {
       handleDowload()
     }
@@ -176,9 +180,9 @@ const handleAdd = (name: string, version: string) => {
       if (!version) {
         version = await getPackLastVersion(name)
       }
-    
+
       let status = await downloadPack(name, version)
- 
+
       if (status === 'downloaded') {
         status = await unzipPack(name, version)
       }
@@ -196,7 +200,7 @@ const handleRemove = (name: string) => {
     if (packageJson.dependencies[name]) {
       delete packageJson.dependencies[name]
     }
-  
+
     fs.writeFileSync('../package.json', JSON.stringify(packageJson, null, 4))
     resolve()
   })
@@ -206,7 +210,7 @@ const handleRemove = (name: string) => {
  * 安装
  * @param list 依赖
  */
-export function install (list: Dependencies): Promise<any> {
+export function install(list: Dependencies): Promise<any> {
   const packLists = getPackLists(list)
   if (packLists.length > 0) {
     shell.mkdir('-p', path.resolve(config.output))
@@ -215,19 +219,22 @@ export function install (list: Dependencies): Promise<any> {
     return
   }
   const tasks = new listr(
-    packLists.map((x) => {
+    packLists.map(x => {
       return {
         title: `install ${x.name}`,
         task: () => handleAdd(x.name, x.version)
       }
     })
   )
-  return tasks.run().then(() => {
-    console.log(`  `)
-    console.log(`   mini-npm run success!`)
-  }).catch((err: any) => {
-    console.error(err)
-  })
+  return tasks
+    .run()
+    .then(() => {
+      console.log(`  `)
+      console.log(`   mini-npm run success!`)
+    })
+    .catch((err: any) => {
+      console.error(err)
+    })
   // return Promise.all(listMap.map(async (x) => await handleAdd(x, resolveVersion(list[x])))).then(res => {
   //   console.log(`mini-npm run success!`)
   //   return res
@@ -236,9 +243,9 @@ export function install (list: Dependencies): Promise<any> {
 
 /**
  * 添加
- * @param name 
+ * @param name
  */
-export function add (list: PackItem): Promise<any> {
+export function add(list: PackItem): Promise<any> {
   const packLists = getPackLists(list)
   if (packLists.length > 0) {
     shell.mkdir('-p', path.resolve(config.output))
@@ -248,22 +255,25 @@ export function add (list: PackItem): Promise<any> {
   }
 
   const tasks = new listr(
-    packLists.map((x) => {
+    packLists.map(x => {
       return {
         title: `install ${x.name}`,
         task: () => handleAdd(x.name, x.version)
       }
     })
   )
-  return tasks.run().then(() => {
-    console.log(`  `)
-    console.log(`   mini-npm run success!`)
-  }).catch((err: any) => {
-    console.error(err)
-  })
+  return tasks
+    .run()
+    .then(() => {
+      console.log(`  `)
+      console.log(`   mini-npm run success!`)
+    })
+    .catch((err: any) => {
+      console.error(err)
+    })
 }
 
-export function remove (list: PackItem): Promise<any> {
+export function remove(list: PackItem): Promise<any> {
   const packLists = getPackLists(list)
   if (packLists.length > 0) {
     shell.mkdir('-p', path.resolve(config.output))
@@ -273,17 +283,20 @@ export function remove (list: PackItem): Promise<any> {
   }
 
   const tasks = new listr(
-    packLists.map((x) => {
+    packLists.map(x => {
       return {
         title: `remove ${x.name}`,
         task: () => handleRemove(x.name)
       }
     })
   )
-  return tasks.run().then(() => {
-    console.log(`  `)
-    console.log(`   mini-npm run success!`)
-  }).catch((err: any) => {
-    console.error(err)
-  })
+  return tasks
+    .run()
+    .then(() => {
+      console.log(`  `)
+      console.log(`   mini-npm run success!`)
+    })
+    .catch((err: any) => {
+      console.error(err)
+    })
 }

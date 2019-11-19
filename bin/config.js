@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var path_1 = __importDefault(require("path"));
 var packageJson = require(path_1.default.resolve('package.json'));
 var config = {
-    output: "mini_node_modules/"
+    output: 'mini_node_modules/'
 };
-if (packageJson["mini-npm-config"]) {
-    Object.assign(config, packageJson["mini-npm-config"]);
+if (packageJson['mini-npm-config']) {
+    Object.assign(config, packageJson['mini-npm-config']);
 }
 exports.default = config;

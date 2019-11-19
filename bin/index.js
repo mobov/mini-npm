@@ -15,8 +15,7 @@ var path_1 = __importDefault(require("path"));
 var commander_1 = __importDefault(require("commander"));
 var packageJson = __importStar(require("../package.json"));
 var core_1 = require("./core");
-commander_1.default
-    .version(packageJson["version"]);
+commander_1.default.version(packageJson['version']);
 commander_1.default
     .command('install')
     .description('安装依赖(install packages)')
