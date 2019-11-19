@@ -11,7 +11,7 @@ program
   .command('install')
   .description('安装依赖(install packages)')
   .action(() => {
-    const targetPackage = require(path.resolve('package.json'))
+    const targetPackage = require(path.resolve(process.cwd(), './package.json'))
     install(targetPackage.dependencies)
   })
 

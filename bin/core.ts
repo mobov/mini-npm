@@ -6,8 +6,7 @@ import path, { format } from 'path'
 import shell from 'shelljs'
 import listr from 'listr'
 
-const packageJson = require(path.resolve('package.json'))
-
+const packageJson = require(path.resolve(process.cwd(), './package.json'))
 type PackItem = Array<string>
 
 interface Dependencies {

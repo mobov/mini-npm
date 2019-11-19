@@ -20,7 +20,7 @@ commander_1.default
     .command('install')
     .description('安装依赖(install packages)')
     .action(function () {
-    var targetPackage = require(path_1.default.resolve('package.json'));
+    var targetPackage = require(path_1.default.resolve(process.cwd(), './package.json'));
     core_1.install(targetPackage.dependencies);
 });
 commander_1.default

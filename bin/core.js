@@ -52,7 +52,7 @@ var compressing_1 = __importDefault(require("compressing"));
 var path_1 = __importDefault(require("path"));
 var shelljs_1 = __importDefault(require("shelljs"));
 var listr_1 = __importDefault(require("listr"));
-var packageJson = require(path_1.default.resolve('package.json'));
+var packageJson = require(path_1.default.resolve(process.cwd(), './package.json'));
 var resolveTgzName = function (name, version) {
     name = name.replace(/@/g, '').replace(/\//, '-');
     return name + "-" + version + ".tgz";
