@@ -55,7 +55,7 @@ var listr_1 = __importDefault(require("listr"));
 var packageJson = require(path_1.default.resolve(process.cwd(), './package.json'));
 var resolveTgzName = function (name, version) {
     name = name.replace(/@/g, '').replace(/\//, '-');
-    return name + "-" + version + ".tgz";
+    return (name + "-" + version + ".tgz").replace('\n', '').replace('\t', '');
 };
 var resolveVersion = function (version) {
     if (version.indexOf('^') !== -1) {

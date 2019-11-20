@@ -21,7 +21,7 @@ type PackLists = Array<PackInfo>
 
 const resolveTgzName = (name: string, version: string): string => {
   name = name.replace(/@/g, '').replace(/\//, '-')
-  return `${name}-${version}.tgz`
+  return `${name}-${version}.tgz`.replace('\n', '').replace('\t', '')
 }
 
 const resolveVersion = (version: string): string => {

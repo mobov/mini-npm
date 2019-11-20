@@ -1,6 +1,6 @@
 {
   "name": "mini-npm",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "mini npm",
   "main": "./bin/index.js",
   "repository": "git@github.com:mobov/mini-npm.git",
