@@ -15,14 +15,12 @@ commander_1.default.version(packageJson['version'])
     var targetPackage = require(path_1.default.resolve(process.cwd(), './package.json'));
     core_1.install(targetPackage.dependencies);
 });
-commander_1.default.version(packageJson['version'])
-    .command('add <pack...>')
+commander_1.default.command('add <pack...>')
     .description('添加依赖(add packages)')
     .action(function (pack) {
     core_1.add(pack);
 });
-commander_1.default.version(packageJson['version'])
-    .command('remove <pack...>')
+commander_1.default.command('remove <pack...>')
     .description('移除依赖(remove packages)')
     .action(function (pack) {
     core_1.remove(pack);

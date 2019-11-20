@@ -14,15 +14,13 @@ program.version(packageJson['version'])
     install(targetPackage.dependencies)
   })
 
-program.version(packageJson['version'])
-  .command('add <pack...>')
+program.command('add <pack...>')
   .description('添加依赖(add packages)')
   .action(pack => {
     add(pack)
   })
 
-program.version(packageJson['version'])
-  .command('remove <pack...>')
+program.command('remove <pack...>')
   .description('移除依赖(remove packages)')
   .action(pack => {
     remove(pack)

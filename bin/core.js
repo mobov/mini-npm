@@ -100,17 +100,17 @@ var getPackLastVersion = function (name) {
     //   console.log(result)
     //   return result
     // }
-    var getVersion = function (str) {
-        var regex = new RegExp(/version: '(.*?)'/, 'g');
-        var arr = str.match(regex);
-        var result = arr[0].substring(10, arr[0].length - 1);
-        return result;
-    };
+    // const getVersion = (str: string): string => {
+    //   const regex = new RegExp(/version: '(.*?)'/, 'g')
+    //   const arr = str.match(regex)
+    //   const result = arr[0].substring(10, arr[0].length - 1)
+    //   return result
+    // }
     return new Promise(function (resolve, reject) {
-        shelljs_1.default.exec("npm view " + name, { silent: true }, function (code, data) {
+        shelljs_1.default.exec("npm view " + name + " version", { silent: true }, function (code, data) {
             if (code === 0) {
-                var version = getVersion(data);
-                resolve(version);
+                // const version = getVersion(data)
+                resolve(data);
             }
             else {
                 reject();

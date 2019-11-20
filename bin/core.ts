@@ -69,17 +69,17 @@ const getPackLastVersion = (name: string): Promise<string> => {
   //   console.log(result)
   //   return result
   // }
-  const getVersion = (str: string): string => {
-    const regex = new RegExp(/version: '(.*?)'/, 'g')
-    const arr = str.match(regex)
-    const result = arr[0].substring(10, arr[0].length - 1)
-    return result
-  }
+  // const getVersion = (str: string): string => {
+  //   const regex = new RegExp(/version: '(.*?)'/, 'g')
+  //   const arr = str.match(regex)
+  //   const result = arr[0].substring(10, arr[0].length - 1)
+  //   return result
+  // }
   return new Promise((resolve, reject) => {
-    shell.exec(`npm view ${name}`, { silent: true }, (code, data) => {
+    shell.exec(`npm view ${name} version`, { silent: true }, (code, data) => {
       if (code === 0) {
-        const version = getVersion(data)
-        resolve(version)
+       // const version = getVersion(data)
+        resolve(data)
       } else {
         reject()
       }
